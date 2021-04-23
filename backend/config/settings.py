@@ -1,3 +1,5 @@
+import os
+
 import environ
 
 env = environ.Env()
@@ -13,7 +15,7 @@ SECRET_KEY = env(
     "SECRET_KEY",
     default='secret-key-of-at-least-50-characters-to-pass-check-deploy',
 )
-#SECRET_KEY = 'django-insecure-=_wk5ev0o)po=23_rcb5-hp+4fpafz16&u13pfo*@uf#m!gt1l'
+# SECRET_KEY = 'django-insecure-=_wk5ev0o)po=23_rcb5-hp+4fpafz16&u13pfo*@uf#m!gt1l'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -32,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #App Registration
+    # App Registration
     'backend.app',
 ]
 
