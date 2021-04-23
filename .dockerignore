@@ -1,0 +1,7 @@
+.vscode/
+.github/
+node_modules/
+build
+!entrypoint.sh
+README.md
+.pre-commit-config.yaml
