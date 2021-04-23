@@ -10,7 +10,6 @@ EXPOSE 3000
 # copy package.json & yarn.lock
 COPY package.json .
 COPY yarn.lock .
-COPY craco.config.js .
 
 # install dependencies
 RUN yarn
