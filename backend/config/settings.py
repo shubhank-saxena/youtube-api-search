@@ -24,6 +24,8 @@ ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
 
 # Application definition
 
@@ -127,5 +129,4 @@ USE_TZ = True
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'backend.core.exceptions.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error',
-    'DEFAULT_AUTHENTICATION_CLASSES': ('backend.authentication.backends.JWTAuthentication',),
 }
