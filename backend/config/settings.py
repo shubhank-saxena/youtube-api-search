@@ -90,6 +90,8 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -126,5 +128,3 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'backend.core.exceptions.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error',
 }
-
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
