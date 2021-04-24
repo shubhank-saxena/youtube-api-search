@@ -1,99 +1,106 @@
 import os
+from pathlib import Path
 
 import environ
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 env = environ.Env()
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-environ.Env.read_env(env_file=os.path.join(BASE_DIR, "../.env"))
-
-DEBUG = env.bool("DEBUG", default=True)
 
 SECRET_KEY = env(
     "SECRET_KEY",
     default='secret-key-of-at-least-50-characters-to-pass-check-deploy',
 )
-# SECRET_KEY = 'django-insecure-=_wk5ev0o)po=23_rcb5-hp+4fpafz16&u13pfo*@uf#m!gt1l'
-
-ALLOWED_HOSTS = ['*']
+DEBUG = env.bool("DEBUG", default=True)
 
 CORS_ORIGIN_ALLOW_ALL = True
-
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+ALLOWED_HOSTS = ['*']
+SESSION_COOKIE_SAMESITE = None
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third Party App imports
-    "rest_framework",
-    "django_filters",
-    "corsheaders",
-    # App Registration
-    "backend.app",
+    'backend.search_api',
+    'django_q',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
-    "backend.config.middleware.HealthCheckMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.config.urls'
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'staticfiles')],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = "backend.config.wsgi.application"
+WSGI_APPLICATION = 'backend.config.wsgi.application'
 
-STATIC_URL = "/staticfiles/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
 
-IN_DOCKER = env.bool("IN_DOCKER", default=False)
+# Database
+# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": env("SQL_ENGINE", default='django.db.backends.postgresql_psycopg2'),
-        "NAME": env("DB_NAME", default="fampay"),
-        "USER": env("DB_USER", default="fampay"),
-        "PASSWORD": env("DB_PASS", default="fampay"),
-        "HOST": env("DB_HOST", default="db" if IN_DOCKER else "localhost"),
-        "PORT": env("DB_PORT", default="5432"),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+# Cache
+# https://docs.djangoproject.com/en/2.2/topics/cache/#database-caching
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache',
+    }
+}
+
+# Django-Q
+# https://django-q.readthedocs.io/en/latest/configure.html#orm
+
+Q_CLUSTER = {'name': 'DjangORM', 'workers': 4, 'timeout': 90, 'retry': 120, 'queue_limit': 20, 'bulk': 10, 'orm': 'default', 'ack_failures': True}
+
+
+YT_BACKGROUND_JOB = {
+    'name': 'YT_JOB',
+    'search_query': 'football',
+    'func_name': 'backend.search_api.services.background_update',
+}
+
 
 # Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -112,11 +119,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
+# https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Kolkata'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -124,7 +131,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'backend.core.exceptions.core_exception_handler',
-    'NON_FIELD_ERRORS_KEY': 'error',
-}
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+STATIC_URL = "/staticfiles/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"

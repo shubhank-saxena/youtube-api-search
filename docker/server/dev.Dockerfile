@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.9.4-slim-buster
+FROM python:3.8.5-slim-buster
 
 # set work directory
 WORKDIR /usr/src/app
@@ -19,7 +19,7 @@ RUN apt-get update \
 # install dependencies
 RUN pip install --upgrade pip
 RUN pip install pipenv
-COPY Pipfile Pipfile.lock pyproject.toml setup.cfg manage.py .env /usr/src/app/
+COPY Pipfile Pipfile.lock manage.py .env /usr/src/app/
 RUN pipenv install --system --deploy --ignore-pipfile
 
 COPY backend /usr/src/app/backend/
