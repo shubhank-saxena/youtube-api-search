@@ -10,7 +10,7 @@ services:
     environment:
       - IN_DOCKER=True
     volumes:
-      - static_volume:/usr/src/app/staticfiles
+      - static_volume:/usr/src/app/backend/staticfiles
     depends_on: 
       - db
   db:
