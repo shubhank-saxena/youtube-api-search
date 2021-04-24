@@ -7,7 +7,5 @@ from . import services, views
 urlpatterns = [
     path('videos', views.GetVideos.as_view()),
     path('key', views.AddAPIKey.as_view()),
-]
-
-static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 services.THREAD.start()
