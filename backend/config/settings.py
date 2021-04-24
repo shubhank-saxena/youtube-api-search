@@ -5,7 +5,6 @@ import environ
 env = environ.Env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
 
 environ.Env.read_env(env_file=os.path.join(BASE_DIR, "../.env"))
 
@@ -58,7 +57,7 @@ ROOT_URLCONF = 'backend.config.urls'
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(FRONTEND_DIR, 'build')],
+        "DIRS": [os.path.join(BASE_DIR, 'staticfiles')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
