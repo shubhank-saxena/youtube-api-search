@@ -23,6 +23,7 @@ COPY Pipfile Pipfile.lock pyproject.toml setup.cfg manage.py .env /usr/src/app/
 RUN pipenv install --system --deploy --ignore-pipfile
 
 COPY backend /usr/src/app/backend/
+COPY staticfiles /usr/src/app/staticfiles/
 COPY docker /usr/src/app/docker
 
 CMD ["chmod", "u+x", "/usr/src/app/docker/server/entrypoint.sh"]

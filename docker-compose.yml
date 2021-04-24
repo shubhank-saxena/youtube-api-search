@@ -10,7 +10,7 @@ services:
     environment:
       - IN_DOCKER=True
     volumes:
-      - static_volume:/usr/src/app/backend/staticfiles
+      - static_volume:/usr/src/app/staticfiles
     depends_on: 
       - db
   db:
@@ -21,25 +21,6 @@ services:
       - POSTGRES_USER=fampay
       - POSTGRES_PASSWORD=fampay
       - POSTGRES_DB=fampay
-  frontend-dev:
-    build:
-      context: .
-      dockerfile: ./docker/client/dev.Dockerfile
-    ports:
-      - 3000:3000
-    stdin_open: true
-  nginx:
-    build:
-      context: .
-      dockerfile: ./docker/nginx/dev.Dockerfile
-    ports: 
-      - 8081:80
-    volumes:
-      - static_volume:/usr/src/app/backend/staticfiles
-    depends_on: 
-      - django-app-dev
-      - frontend-dev
-
 volumes:
   static_volume:
   postgres_data:
