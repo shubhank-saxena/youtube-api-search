@@ -6,11 +6,19 @@ import time
 from apiclient.discovery import build
 from django.db import connections
 
-from .models import APIKey, Video, VideoThumbNail
+from . import models
 
 
 def youtube_search_keyword(query, max_results):
-    api_keys = APIKey.objects.filter(is_limit_over=False)
+    """Fetching the latest videos for a search query using Youtube Data API.
+    Args:
+        query (str): search query.
+        max_results(int): Maximum no of results we want in response from the Y
+            Youtube Data API.
+    Returns:
+        results (list): List of all the videos data in dict format.
+    """
+    api_keys = models.APIKey.objects.filter(is_limit_over=False)
 
     if not len(api_keys):
         return {}
@@ -33,10 +41,22 @@ def youtube_search_keyword(query, max_results):
 
 
 def get_date_time_object_from_string(date_time):
+    """Create a datetime object from string of date and time.
+    Args:
+        date_time (str): String contains date and time.
+    Return:
+        obj: Returns a datetime object.
+    """
     return datetime.datetime.strptime(date_time.split('T')[0] + ' ' + date_time.split('T')[1].split('Z')[0], '%Y-%m-%d %H:%M:%S')
 
 
 def get_desired_video_dict_from_result(result):
+    """Extract relevant values from Youtube Data API Results for video.
+    Args:
+        result (dict): Youtube Data API result in dictionary format.
+    Returns:
+        dict: Returns relevant values of result for video.
+    """
     if 'videoId' in result['id']:
         video_id = result['id']['videoId']
     else:
@@ -51,6 +71,13 @@ def get_desired_video_dict_from_result(result):
 
 
 def get_video_thumbnails_from_result(result):
+    """Extract relevant values from Youtube Data API Results
+    for video thumbnails.
+    Args:
+        result (dict): Youtube Data API result in dictionary format.
+    Returns:
+        list: Returns relevant values of result for video thumbnails.
+    """
     return [
         {
             'screen_size': screen_size,
@@ -61,14 +88,18 @@ def get_video_thumbnails_from_result(result):
 
 
 def save_video_and_thumbail_in_models(result):
+    """Save video and it's thumbnails in Database.
+    Args:
+        result (dict): Youtube Data API result in dictionary format.
+    """
     video_dict = get_desired_video_dict_from_result(result)
-    video_obj = Video(**video_dict)
+    video_obj = models.Video(**video_dict)
     video_obj.save()
 
     thumbnails = get_video_thumbnails_from_result(result)
     for thumbnail in thumbnails:
         thumbnail['video'] = video_obj
-        thumbnail_obj = VideoThumbNail(**thumbnail)
+        thumbnail_obj = models.VideoThumbNail(**thumbnail)
         thumbnail_obj.save()
 
     # Clossing all connections before delay to overcome concurrency
@@ -77,8 +108,12 @@ def save_video_and_thumbail_in_models(result):
 
 
 def get_time_of_most_recent_uploaded_video():
+    """Returns time of most recent uploaded video.
+    Returns:
+        resent_date_time (datetime): Returns datetime object.
+    """
     resent_date_time = ''
-    search_results = youtube_search_keyword('ipl', 50)
+    search_results = youtube_search_keyword('football', 10)
 
     if search_results == {}:
         return
@@ -95,10 +130,13 @@ def get_time_of_most_recent_uploaded_video():
 
 
 async def search_and_add_youtube_videos_service():
+    """Asynchronous function for fetching the latest videos
+    for a search query and should storing it in database.
+    """
     resent_date_time = get_time_of_most_recent_uploaded_video()
 
     while True:
-        search_results = youtube_search_keyword('ipl', 50)
+        search_results = youtube_search_keyword('football', 10)
 
         if search_results == {}:
             return
@@ -114,11 +152,12 @@ async def search_and_add_youtube_videos_service():
 
 
 def start_searching_and_adding_youtube_videos():
+    """Start services for searching and adding youtube videos."""
     while True:
-        api_keys = APIKey.objects.filter(is_limit_over=False)
+        api_keys = models.APIKey.objects.filter(is_limit_over=False)
         if len(api_keys):
             asyncio.run(search_and_add_youtube_videos_service())
-        time.sleep(20)
+        time.sleep(10)
 
 
 THREAD = threading.Thread(target=start_searching_and_adding_youtube_videos)
