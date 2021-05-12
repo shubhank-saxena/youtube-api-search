@@ -11,26 +11,6 @@ from backend.search_api.serializers import YoutubeSerializer
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(module)s [%(levelname)s] %(message)s')
 
 
-def web_page(request):
-    """
-    Serving index.html
-    :param request:
-    :return:
-    """
-
-    try:
-        with open(os.path.join(settings.REACT_APP_DIR, 'build', 'index.html')) as f:
-            return HttpResponse(f.read())
-    except FileNotFoundError:
-        logging.exception('Production build of app not found')
-        return HttpResponse(
-            """
-            Contact with Admin.
-            """,
-            status=404,
-        )
-
-
 def index(request):
     """
      Demo API for testing

@@ -25,6 +25,6 @@ RUN pipenv install --system --deploy --ignore-pipfile
 COPY backend /usr/src/app/backend/
 COPY docker /usr/src/app/docker
 
-CMD ["chmod", "u+x", "/usr/src/app/docker/server/entrypoint.sh"]
 CMD [ "python", "manage.py", "collectstatic" ]
+CMD ["chmod", "u+x", "/usr/src/app/docker/server/entrypoint.sh"]
 ENTRYPOINT ["/usr/src/app/docker/server/entrypoint.sh"]
